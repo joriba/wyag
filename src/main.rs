@@ -1,5 +1,5 @@
 use std::env;
-use wyag::command;
+use wyag::{command, Repository};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -27,4 +27,6 @@ fn main() {
 
         other =>      { panic!("{} is not a valid git command!", other)}
     };
+
+    let r = Repository::new(env::current_dir().unwrap());
 }

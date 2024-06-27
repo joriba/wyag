@@ -1,4 +1,4 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, io, io::{Error, ErrorKind}, path::{Path, PathBuf}};
 
 
 pub mod command {
@@ -36,19 +36,24 @@ pub mod command {
 }
 
 pub struct Repository {
-    worktree: Option<PathBuf>,
-    gitdir: Option<PathBuf>,
+    worktree: PathBuf,
+    gitdir: PathBuf,
     conf: HashMap<String, String>,
 }
 
 impl Repository {
-    pub fn new(path: PathBuf) -> Self { // todo: add force option
+    pub fn new(path: PathBuf, create: bool) -> Result<Self, io::Error> {
         let gitdir = path.join(".git");
+        if !gitdir.exists() || create {
+            return Err(Error::new(ErrorKind::NotFound, "Not a valid Git repo"));
+        }
+
         let result = Self {
-            worktree: Some(path),
-            gitdir: Some(gitdir),
+            worktree: path,
+            gitdir: gitdir,
             conf: HashMap::new()
         };
-        result
+        
+        Ok(result)
     }
 }
