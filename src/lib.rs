@@ -1,3 +1,5 @@
+use std::{collections::HashMap, path::PathBuf};
+
 
 pub mod command {
     use std::io;
@@ -31,4 +33,22 @@ pub mod command {
     pub fn status() -> Result<(), io::Error> { todo!() }
 
     pub fn tag() -> Result<(), io::Error> { todo!() }
+}
+
+pub struct Repository {
+    worktree: Option<PathBuf>,
+    gitdir: Option<PathBuf>,
+    conf: HashMap<String, String>,
+}
+
+impl Repository {
+    pub fn new(path: PathBuf) -> Self { // todo: add force option
+        let gitdir = path.join(".git");
+        let result = Self {
+            worktree: Some(path),
+            gitdir: Some(gitdir),
+            conf: HashMap::new()
+        };
+        result
+    }
 }
