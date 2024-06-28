@@ -46,9 +46,9 @@ pub struct Repository {
 }
 
 impl Repository {
-    pub fn new(path: PathBuf, create: bool) -> Result<Self, io::Error> {
+    pub fn open(path: PathBuf) -> Result<Self, io::Error> {
         let gitdir = path.join(".git");
-        if !gitdir.exists() || create {
+        if !gitdir.exists() {
             return Err(invalid_argument("Not a Git repository"));
         }
 
@@ -59,6 +59,10 @@ impl Repository {
         };
         
         Ok(result)
+    }
+
+    pub fn new(path: PathBuf) -> Result<Self, io::Error> {
+        todo!()
     }
 
     /// Builds a path object from the repo's git directory and the supplied
