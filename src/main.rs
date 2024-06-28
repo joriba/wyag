@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, path::PathBuf};
 use wyag::{command, Repository};
 
 fn main() {
@@ -28,5 +28,5 @@ fn main() {
         other =>      { panic!("{} is not a valid git command!", other)}
     };
 
-    let r = Repository::new(env::current_dir().unwrap());
+    let _ = Repository::new(PathBuf::from("."), false);
 }
