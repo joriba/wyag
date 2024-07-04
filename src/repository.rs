@@ -26,6 +26,29 @@ impl Repository {
         Ok(result)
     }
 
+    fn populate_barebones(repo: &Repository) -> Result<(), io::Error> {
+        fs::create_dir_all(&repo.worktree)?;
+
+        let subdirs = vec!(
+            vec!("branches"),
+            vec!("objects"),
+            vec!("refs", "tags"),
+            vec!("refs", "heads"),
+        );
+
+        let errors: Result<Vec<_>, _> = subdirs.iter()
+            .map(|x| repo.repo_path_create(x.to_vec()))
+            .collect();
+        errors?;
+
+        let description = "Unnamed repository; edit this file 'description' to name the repository.\n";
+        let _ = fs::write(repo.gitdir.join("description"), description);
+
+        let _ = fs::write(repo.gitdir.join("HEAD"), "ref: refs/head/master");
+
+        Ok(())
+    }
+
     pub fn new(path: PathBuf) -> Result<Self, io::Error> {
         let gitdir = path.join(".wyag");
         let result = Self {
@@ -43,25 +66,7 @@ impl Repository {
                 return Err(invalid_argument("Directory is not empty"))
             }
         }
-        else {
-            fs::create_dir_all(&result.worktree)?;
-        }
-
-        let subdirs = vec!(
-            vec!("branches"),
-            vec!("objects"),
-            vec!("refs", "tags"),
-            vec!("refs", "heads"),
-        );
-        let errors: Result<Vec<_>, _> = subdirs.iter()
-            .map(|x| result.repo_path_create(x.to_vec()))
-            .collect();
-        errors?;
-
-        let description = "Unnamed repository; edit this file 'description' to name the repository.\n";
-        let _ = fs::write(gitdir.join("description"), description);
-
-        let _ = fs::write(gitdir.join("HEAD"), "ref: refs/head/master");
+        Self::populate_barebones(&result)?;
 
         Ok(result)
     }
