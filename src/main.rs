@@ -8,7 +8,7 @@ fn main() {
     }
 
     let command = &args[1];
-    let _ = match &command[..] {
+    let result = match &command[..] {
         "add" =>            { command::add() },
         "cat-file" =>       { command::cat_file() },
         "check-ignore" =>   { command::check_ignore() },
@@ -27,6 +27,5 @@ fn main() {
 
         other =>      { panic!("{} is not a valid git command!", other)}
     };
-
-    let _ = Repository::new(PathBuf::from("."), false);
+    result.unwrap()
 }

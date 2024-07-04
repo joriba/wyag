@@ -2,7 +2,9 @@ use std::{collections::HashMap, fs, io::{self, Error, ErrorKind}, path::PathBuf}
 
 
 pub mod command {
-    use std::io;
+    use std::{io, path::{Path, PathBuf}};
+
+    use crate::Repository;
 
     pub fn add() -> Result<(), io::Error> { todo!() }
 
@@ -16,7 +18,11 @@ pub mod command {
 
     pub fn hash_object() -> Result<(), io::Error> { todo!() }
 
-    pub fn init() -> Result<(), io::Error> { todo!() }
+    pub fn init() -> Result<(), io::Error> { 
+        let path = Path::new("");
+        let repo = Repository::new(path.to_path_buf());
+        repo.map(|_| ())
+    }
 
     pub fn log() -> Result<(), io::Error> { todo!() }
 
@@ -47,7 +53,7 @@ pub struct Repository {
 
 impl Repository {
     pub fn open(path: PathBuf) -> Result<Self, io::Error> {
-        let gitdir = path.join(".git");
+        let gitdir = path.join(".rgit");
         if !gitdir.exists() {
             return Err(invalid_argument("Not a Git repository"));
         }
@@ -55,14 +61,44 @@ impl Repository {
         let result = Self {
             worktree: path,
             gitdir: gitdir,
-            conf: HashMap::new()
+            conf: HashMap::new() // todo: read config file here
         };
         
         Ok(result)
     }
 
     pub fn new(path: PathBuf) -> Result<Self, io::Error> {
-        todo!()
+        let gitdir = path.join(".wyag");
+        let result = Self {
+            worktree: path,
+            gitdir: gitdir,
+            conf: HashMap::new()
+        };
+
+        if result.worktree.exists() {
+            if !result.worktree.is_dir() {
+                // todo: fix error handling, there might be a better way to do this.
+                return Err(invalid_argument("Not a directory"))
+            }
+            if result.gitdir.exists() && fs::read_dir(&result.gitdir)?.next().is_some() {
+                return Err(invalid_argument("Directory is not empty"))
+            }
+        }
+        else {
+            fs::create_dir_all(&result.worktree)?;
+        }
+
+        let subdirs = vec!(
+            vec!("branches"),
+            vec!("objects"),
+            vec!("refs", "tags"),
+            vec!("refs", "heads"),
+        );
+        let errors: Result<Vec<_>, _> = subdirs.iter()
+            .map(|x| result.repo_path_create(x.to_vec()))
+            .collect();
+        errors?;
+        Ok(result)
     }
 
     /// Builds a path object from the repo's git directory and the supplied
@@ -92,7 +128,7 @@ impl Repository {
         let path = self.repo_path(paths);
         if path.exists() {
             if path.is_dir() { return Ok(path); }
-            else { return Err(invalid_argument("Not a directory!"))}
+            else { return Err(invalid_argument("Not a directory!")) }
         } 
         
         fs::create_dir_all(path.as_os_str())?;
