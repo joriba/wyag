@@ -71,8 +71,8 @@ impl Repository {
         let gitdir = path.join(".wyag");
         let result = Self {
             worktree: path,
-            gitdir: gitdir,
-            conf: HashMap::new()
+            gitdir: gitdir.clone(),
+            conf: HashMap::new() // todo: get the HashMap from the config file
         };
 
         if result.worktree.exists() {
@@ -98,6 +98,12 @@ impl Repository {
             .map(|x| result.repo_path_create(x.to_vec()))
             .collect();
         errors?;
+
+        let description = "Unnamed repository; edit this file 'description' to name the repository.\n";
+        let _ = fs::write(gitdir.join("description"), description);
+
+        let _ = fs::write(gitdir.join("HEAD"), "ref: refs/head/master");
+
         Ok(result)
     }
 
