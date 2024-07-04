@@ -1,5 +1,5 @@
-use std::{env, path::PathBuf};
-use wyag::{command, Repository};
+use std::env;
+use wyag::command;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
