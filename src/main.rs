@@ -29,5 +29,9 @@ fn main() {
             panic!("{} is not a valid git command!", other)
         }
     };
-    result.unwrap()
+
+    match result {
+        Ok(()) => println!("Command {} successful!", command),
+        Err(error) => panic!("{}", error),
+    }
 }
