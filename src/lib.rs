@@ -1,9 +1,5 @@
-use std::io::{self, Error, ErrorKind};
-
 pub mod command;
-
-pub fn invalid_argument(message: &'static str) -> io::Error {
-    Error::new(ErrorKind::InvalidInput, message)
-}
-
 pub mod repository;
+pub mod wyag_error;
+
+pub use crate::wyag_error::Error::*;
