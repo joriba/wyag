@@ -5,8 +5,8 @@ use std::fs;
 use std::path::PathBuf;
 
 pub struct Repository {
-    worktree: PathBuf,
-    gitdir: PathBuf,
+    pub worktree: PathBuf,
+    pub gitdir: PathBuf,
     conf: HashMap<String, String>,
 }
 
@@ -86,9 +86,10 @@ impl Repository {
     /// use wyag::repository::Repository;
     /// use std::path::PathBuf;
     ///
-    /// let repo = Repository::new(PathBuf::from(".")).unwrap();
+    /// let repo = Repository::new(PathBuf::from("test_repo")).unwrap();
     /// let path = repo.repo_path(vec!("refs", "remotes", "origin"));
-    /// assert_eq!(path, PathBuf::from("./.wyag/refs/remotes/origin"));
+    /// assert_eq!(path, PathBuf::from("test_repo/.wyag/refs/remotes/origin"));
+    /// std::fs::remove_dir_all(repo.gitdir);
     /// ```
     pub fn repo_path(&self, paths: Vec<&str>) -> PathBuf {
         paths.iter().fold(self.gitdir.clone(), |acc, x| acc.join(x))
