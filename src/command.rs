@@ -25,8 +25,10 @@ pub fn hash_object() -> Result<(), Error> {
     todo!()
 }
 
-pub fn init() -> Result<(), Error> {
-    let path = Path::new("");
+pub fn init(args: &Vec<String>) -> Result<(), Error> {
+    let default_path_str = String::from(".");
+    let path_str = args.get(2).unwrap_or(&default_path_str);
+    let path = Path::new(path_str);
     match Repository::new(path.to_path_buf()) {
         Ok(_) => Ok(()),
         Err(e) => Err(e),

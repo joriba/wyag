@@ -15,7 +15,7 @@ fn main() {
         "checkout" => command::checkout(),
         "commit" => command::commit(),
         "hash-object" => command::hash_object(),
-        "init" => command::init(),
+        "init" => command::init(&args),
         "log" => command::log(),
         "ls-files" => command::ls_files(),
         "ls-tree" => command::ls_tree(),
