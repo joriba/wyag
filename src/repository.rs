@@ -64,7 +64,10 @@ impl Repository {
             gitdir: gitdir.clone(),
             conf: HashMap::new(), // todo: get the HashMap from the config file
         };
+
+        let mut existed = false; // used for error handling below
         if result.worktree.exists() {
+            existed = true;
             if !result.worktree.is_dir() {
                 return Err(InvalidArgument("Not a Directory"));
             }
@@ -76,7 +79,12 @@ impl Repository {
         match Self::populate_new_repo(&result) {
             Ok(()) => (),
             Err(error) => {
-                // todo: rollback changes made to the filesystem
+                // rollback changes
+                if existed { // don't delete the worktree, only the gitdir
+                    fs::remove_dir_all(result.gitdir)?;
+                } else {
+                    fs::remove_dir_all(result.worktree)?;
+                }
                 return Err(error);
             }
         }
