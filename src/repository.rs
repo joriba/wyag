@@ -1,3 +1,5 @@
+use defaults::GIT_SUBDIR;
+
 use crate::wyag_error::Error;
 use crate::InvalidArgument;
 use std::collections::HashMap;
@@ -10,9 +12,14 @@ pub struct Repository {
     conf: HashMap<String, String>,
 }
 
+pub mod defaults {
+    pub const INIT_DIRECTORY: &'static str = ".";
+    pub const GIT_SUBDIR: &'static str = ".wyag";
+}
+
 impl Repository {
     pub fn open(path: PathBuf) -> Result<Self, Error> {
-        let gitdir = path.join(".rgit");
+        let gitdir = path.join(GIT_SUBDIR);
         if !gitdir.exists() {
             return Err(InvalidArgument("Not a Git repository"));
         }
@@ -51,7 +58,7 @@ impl Repository {
     }
 
     pub fn new(path: PathBuf) -> Result<Self, Error> {
-        let gitdir = path.join(".wyag");
+        let gitdir = path.join(GIT_SUBDIR);
         let result = Self {
             worktree: path,
             gitdir: gitdir.clone(),
@@ -84,11 +91,14 @@ impl Repository {
     /// # Examples
     /// ```
     /// use wyag::repository::Repository;
+    /// use wyag::repository::defaults;
     /// use std::path::PathBuf;
     ///
     /// let repo = Repository::new(PathBuf::from("test_repo")).unwrap();
-    /// let path = repo.repo_path(vec!("refs", "remotes", "origin"));
-    /// assert_eq!(path, PathBuf::from("test_repo/.wyag/refs/remotes/origin"));
+    /// 
+    /// let expected = format!("test_repo/{}/refs/remotes/origin", defaults::GIT_SUBDIR);
+    /// let actual = repo.repo_path(vec!("refs", "remotes", "origin"));
+    /// assert_eq!(PathBuf::from(expected), actual);
     /// std::fs::remove_dir_all(repo.gitdir);
     /// ```
     pub fn repo_path(&self, paths: Vec<&str>) -> PathBuf {

@@ -1,4 +1,4 @@
-use crate::{repository::Repository, wyag_error::Error};
+use crate::{repository::{self, Repository}, wyag_error::Error};
 use std::path::Path;
 
 pub fn add() -> Result<(), Error> {
@@ -26,7 +26,7 @@ pub fn hash_object() -> Result<(), Error> {
 }
 
 pub fn init(args: &Vec<String>) -> Result<(), Error> {
-    let default_path_str = String::from(".");
+    let default_path_str = String::from(repository::defaults::INIT_DIRECTORY);
     let path_str = args.get(2).unwrap_or(&default_path_str);
     let path = Path::new(path_str);
     match Repository::new(path.to_path_buf()) {
