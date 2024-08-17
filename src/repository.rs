@@ -83,12 +83,12 @@ impl Repository {
     ///
     /// # Examples
     /// ```
-    /// use wyag::Repository;
+    /// use wyag::repository::Repository;
     /// use std::path::PathBuf;
     ///
-    /// let repo = Repository::new(PathBuf::from("."), false).unwrap();
+    /// let repo = Repository::new(PathBuf::from(".")).unwrap();
     /// let path = repo.repo_path(vec!("refs", "remotes", "origin"));
-    /// assert_eq!(path, PathBuf::from("./.git/refs/remotes/origin"));
+    /// assert_eq!(path, PathBuf::from("./.wyag/refs/remotes/origin"));
     /// ```
     pub fn repo_path(&self, paths: Vec<&str>) -> PathBuf {
         paths.iter().fold(self.gitdir.clone(), |acc, x| acc.join(x))
